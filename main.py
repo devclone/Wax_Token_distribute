@@ -1,12 +1,9 @@
 #!/usr/bin/python3
-from farmer import Farmer
 import logger
 from logger import log
 import yaml
 import sys
-import utils
-import random
-import time 
+from token_distribute import Distribute
 from settings import load_user_param, user_param
 
 def run(config_file: str):
@@ -15,8 +12,11 @@ def run(config_file: str):
         file.close()
     load_user_param(user)
     logger.init_loger(user_param.wax_account)
-    log.info("=====开始分发代币 FWF =====")
-
+    log.info("=====开始分发代币=====")
+    distribute = Distribute()
+    log.info("=====开分发代币结束=====")
+    distribute.start()
+    log.info("=====开分发代币结束=====")
     # farmer = Farmer()
     # farmer.wax_account = user_param.wax_account
     # if user_param.use_proxy:
@@ -35,7 +35,7 @@ def main():
             user_yml = sys.argv[1]
         run(user_yml)
     except Exception:
-        log.exception("start error")
+        log.exception("distribute error")
 
 if __name__ == '__main__':
     main()

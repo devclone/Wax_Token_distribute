@@ -2,10 +2,15 @@
 
 import contract
 import time
+import logging
+from logger import log
+from settings import user_param
+from settings import cfg
 
 class Distribute:
     def __init__(self) -> None:
-        pass
+        self.log: logging.LoggerAdapter = log
+        self.wax_account: str = user_param.wax_account
 
     # 签署交易(只许成功，否则抛异常）
     def wax_transact(self, transaction: dict):
@@ -25,3 +30,45 @@ class Distribute:
             else:
                 self.log.error("transact error: {0}".format(result))
             raise TransactException(result)
+
+    def start(self):
+        self.log.info("正在分发资金...")
+        # format(1.23456, '.4f')
+        fwf = format(10, '.4f')
+        quantity = fwf + " FWG"
+
+        for account in user_param.to_accounts:
+            for key in account.keys():
+                self.log.info(f"Send {account[key]} FWF to {key}")
+        
+        # 格式：1.0000 FWG
+        transaction = {
+            "actions": [{
+                "account": "farmerstoken",
+                "name": "transfer",
+                "authorization": [{
+                    "actor": self.wax_account,
+                    "permission": "active",
+                }],
+                "data": {
+                    "from": self.wax_account,
+                    "to" : "jrwfk.wam",
+                    "quantity": quantity,
+                    "memo": "collection",
+                },
+            }],
+        }
+
+        # self.wax_transact(transaction)
+        self.log.info(f"发送: {quantity} 到 jrwfk.wam 完成")
+
+class FarmerException(Exception):
+    pass
+
+# 调用智能合约出错，此时应停止并检查日志，不宜反复重试
+class TransactException(FarmerException):
+    # 有的智能合约错误可以重试,-1为无限重试
+    def __init__(self, msg, retry=True, max_retry_times: int = -1):
+        super().__init__(msg)
+        self.retry = retry
+        self.max_retry_times = max_retry_times
