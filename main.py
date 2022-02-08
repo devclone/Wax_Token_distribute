@@ -12,21 +12,8 @@ def run(config_file: str):
         file.close()
     load_user_param(user)
     logger.init_loger(user_param.wax_account)
-    log.info("=====开始分发代币=====")
     distribute = Distribute()
-    log.info("=====开分发代币结束=====")
     distribute.start()
-    log.info("=====开分发代币结束=====")
-    # farmer = Farmer()
-    # farmer.wax_account = user_param.wax_account
-    # if user_param.use_proxy:
-    #     farmer.proxy = user_param.proxy
-    #     log.info("use proxy: {0}".format(user_param.proxy))
-    # farmer.init()
-    # farmer.start()
-    # log.info("=====开始自动化=====")
-    # return farmer.run_forever()
-
 
 def main():
     try:

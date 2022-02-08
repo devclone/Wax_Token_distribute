@@ -6,6 +6,8 @@ from datetime import timedelta
 class Settings:
     path_logs: str
 
+    # 发送合约请求的间隔
+    transact_interval = 10
 
 # 用户配置参数
 class user_param:

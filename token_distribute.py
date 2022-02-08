@@ -15,10 +15,10 @@ class Distribute:
     # 签署交易(只许成功，否则抛异常）
     def wax_transact(self, transaction: dict):
 
-        self.log.info("begin transact: {0}".format(transaction))
+        self.log.debug("begin transact: {0}".format(transaction))
         success, result = contract.push_transaction(transaction)
         if success:
-            self.log.info("transact ok, transaction_id: [{0}]".format(result["transaction_id"]))
+            self.log.debug("transact ok, transaction_id: [{0}]".format(result["transaction_id"]))
             self.log.debug("transact result: {0}".format(result))
             time.sleep(cfg.transact_interval)
             return result
@@ -33,34 +33,32 @@ class Distribute:
 
     def start(self):
         self.log.info("正在分发资金...")
-        # format(1.23456, '.4f')
-        fwf = format(10, '.4f')
-        quantity = fwf + " FWG"
 
         for account in user_param.to_accounts:
             for key in account.keys():
-                self.log.info(f"Send {account[key]} FWF to {key}")
-        
-        # 格式：1.0000 FWG
-        transaction = {
-            "actions": [{
-                "account": "farmerstoken",
-                "name": "transfer",
-                "authorization": [{
-                    "actor": self.wax_account,
-                    "permission": "active",
-                }],
-                "data": {
-                    "from": self.wax_account,
-                    "to" : "jrwfk.wam",
-                    "quantity": quantity,
-                    "memo": "collection",
-                },
-            }],
-        }
+                fwf = format(account[key], '.4f')
+                quantity = fwf + " FWF"
 
-        # self.wax_transact(transaction)
-        self.log.info(f"发送: {quantity} 到 jrwfk.wam 完成")
+                transaction = {
+                    "actions": [{
+                        "account": "farmerstoken",
+                        "name": "transfer",
+                        "authorization": [{
+                            "actor": self.wax_account,
+                            "permission": "active",
+                        }],
+                        "data": {
+                            "from": self.wax_account,
+                            "to" : key,
+                            "quantity": quantity,
+                            "memo": "collection",
+                        },
+                    }],
+                }
+                self.log.info(f"Send {account[key]} FWF to {key}")
+                self.wax_transact(transaction)
+        
+        self.log.info("资金分发完成！！")
 
 class FarmerException(Exception):
     pass
