@@ -51,7 +51,7 @@ class Distribute:
                             "from": self.wax_account,
                             "to" : key,
                             "quantity": quantity,
-                            "memo": "collection",
+                            "memo": "distribution",
                         },
                     }],
                 }
